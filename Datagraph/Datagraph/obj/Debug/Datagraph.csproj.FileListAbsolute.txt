@@ -37,4 +37,3 @@ Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.exe
 Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.pdb
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.exe
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.pdb
-Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\Datagraph.csprojResolveAssemblyReference.cache

@@ -18,19 +18,24 @@ namespace datagraph
 {
   public partial class Form1 : Form
   {
-    static string filepath;
+    static string selectedPath;
     private static double i, j, k;
     Boolean isDefaultLoc = true;
     Boolean isRoot = true;
-    DataTable dt = new DataTable();
+    DataTable dataTable = new DataTable();
     public Form1()
     {
       InitializeComponent();
+      populateInitialValues();
+    }
+
+    private void populateInitialValues()
+    {
       folderBrowserDialog2 = new FolderBrowserDialog();
-      dt.Columns.Add("Radius(r)");
-      dt.Columns.Add("Tangential Stress");
-      dt.Columns.Add("Longitudinal Stress");
-      dt.Columns.Add("Radial Stress");
+      dataTable.Columns.Add("Radius(r)");
+      dataTable.Columns.Add("Tangential Stress");
+      dataTable.Columns.Add("Longitudinal Stress");
+      dataTable.Columns.Add("Radial Stress");
       comboBox1.Items.Add("Yes");
       comboBox1.Items.Add("No");
       label10.Text = DateTime.Now.ToString();
@@ -45,6 +50,7 @@ namespace datagraph
                ControlStyles.UserPaint,
                true);
     }
+
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
     {
       if (keyData == (Keys.Control | Keys.C))
@@ -153,15 +159,15 @@ namespace datagraph
               ts2 = Math.Round(tsn, 4);
               double rsn = (p1 / p2) + (p3 / p4);
               rs2 = Math.Round(rsn, 4);
-              dr = this.dt.NewRow();
-              this.dt.Rows.Add(dr);
+              dr = this.dataTable.NewRow();
+              this.dataTable.Rows.Add(dr);
               while (j <= k)
               {
                 dr[0] = i;
                 dr[1] = ts2;
                 dr[2] = ls;
                 dr[3] = rs2;
-                dataGridView1.DataSource = dt;
+                dataGridView1.DataSource = dataTable;
                 j++;
               }
               k = k + 4;
@@ -209,74 +215,27 @@ namespace datagraph
 
     private void textBox1_TextChanged(object sender, EventArgs e)
     {
-      String s;
-      s = textBox1.Text;
-      foreach (char c in s)
-      {
-        if (Char.IsLetter(c))
-        {
-          MessageBox.Show("Only Numbers(See the rules in the View Menu)", "Inform", MessageBoxButtons.OK, MessageBoxIcon.Error);
-          textBox1.ResetText();
-        }
-      }
+      FormUtil.verifyTextBoxInputIsNum(textBox1);
     }
 
     private void textBox2_TextChanged(object sender, EventArgs e)
     {
-      String s;
-      s = textBox2.Text;
-      foreach (char c in s)
-      {
-        if (Char.IsLetter(c))
-        {
-          MessageBox.Show("Only Numbers", "Inform", MessageBoxButtons.OK, MessageBoxIcon.Error);
-          textBox2.ResetText();
-        }
-      }
+      FormUtil.verifyTextBoxInputIsNum(textBox2);
     }
 
     private void textBox3_TextChanged(object sender, EventArgs e)
     {
-
-      String s;
-      s = textBox3.Text;
-      foreach (char c in s)
-      {
-        if (Char.IsLetter(c))
-        {
-          MessageBox.Show("Only Numbers", "Inform", MessageBoxButtons.OK, MessageBoxIcon.Error);
-          textBox3.ResetText();
-        }
-      }
+      FormUtil.verifyTextBoxInputIsNum(textBox3);
     }
 
     private void textBox4_TextChanged(object sender, EventArgs e)
     {
-      String s;
-      s = textBox4.Text;
-      foreach (char c in s)
-      {
-        if (Char.IsLetter(c))
-        {
-          MessageBox.Show("Only Numbers", "Inform", MessageBoxButtons.OK, MessageBoxIcon.Error);
-          textBox4.ResetText();
-        }
-      }
+      FormUtil.verifyTextBoxInputIsNum(textBox4);
     }
 
     private void textBox5_TextChanged(object sender, EventArgs e)
     {
-
-      String s;
-      s = textBox5.Text;
-      foreach (char c in s)
-      {
-        if (Char.IsLetter(c))
-        {
-          MessageBox.Show("Only Numbers", "Inform", MessageBoxButtons.OK, MessageBoxIcon.Error);
-          textBox5.ResetText();
-        }
-      }
+      FormUtil.verifyTextBoxInputIsNum(textBox5);
     }
 
     private void button3_Click(object sender, EventArgs e)
@@ -432,7 +391,7 @@ namespace datagraph
     }
     private void button6_Click(object sender, EventArgs e)
     {
-      dt.Clear();
+      dataTable.Clear();
     }
 
     private void toolStripMenuItem2_Click(object sender, EventArgs e)
@@ -480,11 +439,11 @@ namespace datagraph
 
       if (isDefaultLoc == false)
       {
-        path = @filepath + "Export\\" + folderdate;
+        path = @selectedPath + "Export\\" + folderdate;
       }
       else if (isRoot == false)
       {
-        path = @filepath + "\\Export\\" + folderdate;
+        path = @selectedPath + "\\Export\\" + folderdate;
       }
       else
       {
@@ -578,11 +537,11 @@ namespace datagraph
       string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
       if (isDefaultLoc == false)
       {
-        path = @filepath + "Export\\" + folderdate;
+        path = @selectedPath + "Export\\" + folderdate;
       }
       else if (isRoot == false)
       {
-        path = @filepath + "\\Export\\" + folderdate;
+        path = @selectedPath + "\\Export\\" + folderdate;
       }
       else
       {
@@ -665,11 +624,11 @@ namespace datagraph
       String path;
       if (isDefaultLoc == false)
       {
-        path = @filepath + "Export";
+        path = @selectedPath + "Export";
       }
       else if (isRoot == false)
       {
-        path = @filepath + "\\Export";
+        path = @selectedPath + "\\Export";
       }
       else
       {
@@ -692,11 +651,11 @@ namespace datagraph
 
       if (isDefaultLoc == false)
       {
-        path = @filepath + "Export";
+        path = @selectedPath + "Export";
       }
       else if (isRoot == false)
       {
-        path = @filepath + "\\Export";
+        path = @selectedPath + "\\Export";
       }
       else
       {
@@ -760,11 +719,11 @@ namespace datagraph
       string path;
       if (isDefaultLoc == false)
       {
-        path = @filepath + "Export";
+        path = @selectedPath + "Export";
       }
       else if (isRoot == false)
       {
-        path = @filepath + "\\Export";
+        path = @selectedPath + "\\Export";
       }
       else
       {
@@ -792,8 +751,8 @@ namespace datagraph
       if (folderBrowserDialog2.ShowDialog() == DialogResult.OK)
       {
 
-        filepath = folderBrowserDialog2.SelectedPath;
-        DirectoryInfo d = new DirectoryInfo(filepath);
+        selectedPath = folderBrowserDialog2.SelectedPath;
+        DirectoryInfo d = new DirectoryInfo(selectedPath);
         if (d.Parent == null)
         {
           isDefaultLoc = false;
@@ -801,7 +760,7 @@ namespace datagraph
         }
         else
         {
-          MessageBox.Show("Path is:" + filepath, "Info", MessageBoxButtons.OK);
+          MessageBox.Show("Path is:" + selectedPath, "Info", MessageBoxButtons.OK);
           isRoot = false;
         }
       }
@@ -817,23 +776,15 @@ namespace datagraph
 
     private void reset()
     {
-      dt.Clear();
+      dataTable.Clear();
       comboBox1.Text = "Select";
-      textBox1.ResetText();
-      textBox2.ResetText();
-      textBox3.ResetText();
-      textBox4.ResetText();
-      textBox5.ResetText();
-      textBox6.ResetText();
-      textBox7.ResetText();
-      textBox8.ResetText();
+      FormUtil.ClearTextBoxes(Controls);
       if (pictureBox1.Image != null)
       {
         pictureBox1.Image.Dispose();
         pictureBox1.Image = null;
         pictureBox1.ResetText();
       }
-
     }
 
     private void resetToolStripMenuItem_Click(object sender, EventArgs e)
