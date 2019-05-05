@@ -434,26 +434,13 @@ namespace datagraph
 
     private void button7_Click_1(object sender, EventArgs e)
     {
-      string path;
       string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
-
-      if (isDefaultLoc == false)
-      {
-        path = @selectedPath + "Export\\" + folderdate;
-      }
-      else if (isRoot == false)
-      {
-        path = @selectedPath + "\\Export\\" + folderdate;
-      }
-      else
-      {
-        path = @"C:\Export\" + folderdate;
-      }
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
+      path = path + "\\" + folderdate;
 
       if (!Directory.Exists(path))
       {
         System.IO.Directory.CreateDirectory(path);
-
       }
 
       string filename = @path + "\\exprt.xls";
@@ -533,25 +520,13 @@ namespace datagraph
     }
     private void graphext()
     {
-      string path;
       string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
-      if (isDefaultLoc == false)
-      {
-        path = @selectedPath + "Export\\" + folderdate;
-      }
-      else if (isRoot == false)
-      {
-        path = @selectedPath + "\\Export\\" + folderdate;
-      }
-      else
-      {
-        path = @"C:\Export\" + folderdate;
-      }
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
+      path = path + "\\" + folderdate;
 
       if (!Directory.Exists(path))
       {
         System.IO.Directory.CreateDirectory(path);
-
       }
 
       string imagenew = path + "\\Image.jpeg";
@@ -621,19 +596,7 @@ namespace datagraph
 
     private void goToFolderToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      String path;
-      if (isDefaultLoc == false)
-      {
-        path = @selectedPath + "Export";
-      }
-      else if (isRoot == false)
-      {
-        path = @selectedPath + "\\Export";
-      }
-      else
-      {
-        path = "C:\\Export";
-      }
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
       DirectoryInfo dir = new DirectoryInfo(path);
       if (Directory.Exists(path))
       {
@@ -647,21 +610,8 @@ namespace datagraph
 
     private void manageSpaceToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      string path;
-
-      if (isDefaultLoc == false)
-      {
-        path = @selectedPath + "Export";
-      }
-      else if (isRoot == false)
-      {
-        path = @selectedPath + "\\Export";
-      }
-      else
-      {
-        path = "C:\\Export";
-      }
-
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
+   
       if (MessageBox.Show("Delete all the files?", "Manage Space", MessageBoxButtons.OKCancel) == DialogResult.OK)
       {
         if (pictureBox1.Image != null)
@@ -716,19 +666,7 @@ namespace datagraph
 
     private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      string path;
-      if (isDefaultLoc == false)
-      {
-        path = @selectedPath + "Export";
-      }
-      else if (isRoot == false)
-      {
-        path = @selectedPath + "\\Export";
-      }
-      else
-      {
-        path = "C:\\Export";
-      }
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
       DirectoryInfo dir = new DirectoryInfo(path);
       if (Directory.Exists(path))
       {
@@ -750,7 +688,6 @@ namespace datagraph
 
       if (folderBrowserDialog2.ShowDialog() == DialogResult.OK)
       {
-
         selectedPath = folderBrowserDialog2.SelectedPath;
         DirectoryInfo d = new DirectoryInfo(selectedPath);
         if (d.Parent == null)

@@ -28,12 +28,12 @@ Z:\C#\Datagraph\Datagraph\obj\Debug\Datagraph.csprojResolveAssemblyReference.cac
 Z:\C#\Datagraph\Datagraph\obj\Debug\datagraph.Form1.resources
 Z:\C#\Datagraph\Datagraph\obj\Debug\datagraph.Properties.Resources.resources
 Z:\C#\Datagraph\Datagraph\obj\Debug\Datagraph.csproj.GenerateResource.Cache
+Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.exe.config
+Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.exe
+Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.pdb
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\Datagraph.csproj.ResolveComReference.cache
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.Form1.resources
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.Properties.Resources.resources
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\Datagraph.csproj.GenerateResource.Cache
-Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.exe.config
-Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.exe
-Z:\GIT\Graph\Datagraph\Datagraph\bin\Debug\datagraph.pdb
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.exe
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.pdb
