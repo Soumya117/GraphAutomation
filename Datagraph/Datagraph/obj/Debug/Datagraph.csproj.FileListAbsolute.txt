@@ -37,3 +37,4 @@ Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.Properties.Resources.resour
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\Datagraph.csproj.GenerateResource.Cache
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.exe
 Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\datagraph.pdb
+Z:\GIT\Graph\Datagraph\Datagraph\obj\Debug\Datagraph.csprojResolveAssemblyReference.cache

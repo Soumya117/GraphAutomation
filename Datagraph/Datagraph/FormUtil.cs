@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
+using System.IO;
 using System.Windows.Forms;
 
 namespace datagraph
@@ -48,6 +49,19 @@ namespace datagraph
         path = "C:\\Export";
       }
       return path;
+    }
+
+    public static void DeleteDirectory(string path)
+    {
+      foreach (string filename in Directory.GetFiles(path))
+      {
+        File.Delete(filename);
+      }
+      foreach (string subfolder in Directory.GetDirectories(path))
+      {
+        DeleteDirectory(subfolder);
+      }
+      Directory.Delete(path);
     }
   }
 }

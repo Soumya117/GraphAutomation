@@ -82,7 +82,6 @@
       this.defaultFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
       this.tabPage2 = new System.Windows.Forms.TabPage();
       this.button7 = new System.Windows.Forms.Button();
-      this.button6 = new System.Windows.Forms.Button();
       this.button5 = new System.Windows.Forms.Button();
       this.dataGridView1 = new System.Windows.Forms.DataGridView();
       this.tabPage3 = new System.Windows.Forms.TabPage();
@@ -185,7 +184,7 @@
       // 
       this.checkBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
       this.checkBox1.AutoSize = true;
-      this.checkBox1.Location = new System.Drawing.Point(523, 293);
+      this.checkBox1.Location = new System.Drawing.Point(523, 308);
       this.checkBox1.Name = "checkBox1";
       this.checkBox1.Size = new System.Drawing.Size(68, 17);
       this.checkBox1.TabIndex = 62;
@@ -197,7 +196,7 @@
       this.label20.Anchor = System.Windows.Forms.AnchorStyles.None;
       this.label20.AutoSize = true;
       this.label20.Font = new System.Drawing.Font("Times New Roman", 11.25F);
-      this.label20.Location = new System.Drawing.Point(264, 293);
+      this.label20.Location = new System.Drawing.Point(122, 275);
       this.label20.Name = "label20";
       this.label20.Size = new System.Drawing.Size(94, 17);
       this.label20.TabIndex = 61;
@@ -206,7 +205,7 @@
       // numericUpDown1
       // 
       this.numericUpDown1.Anchor = System.Windows.Forms.AnchorStyles.None;
-      this.numericUpDown1.Location = new System.Drawing.Point(364, 293);
+      this.numericUpDown1.Location = new System.Drawing.Point(348, 272);
       this.numericUpDown1.Name = "numericUpDown1";
       this.numericUpDown1.Size = new System.Drawing.Size(31, 20);
       this.numericUpDown1.TabIndex = 38;
@@ -257,7 +256,7 @@
       this.label14.BackColor = System.Drawing.Color.Transparent;
       this.label14.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
       this.label14.Font = new System.Drawing.Font("Times New Roman", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.label14.Location = new System.Drawing.Point(120, 249);
+      this.label14.Location = new System.Drawing.Point(121, 244);
       this.label14.Name = "label14";
       this.label14.Size = new System.Drawing.Size(92, 19);
       this.label14.TabIndex = 56;
@@ -366,11 +365,11 @@
       this.button2.Anchor = System.Windows.Forms.AnchorStyles.None;
       this.button2.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
       this.button2.Font = new System.Drawing.Font("Times New Roman", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.button2.Location = new System.Drawing.Point(429, 289);
+      this.button2.Location = new System.Drawing.Point(409, 301);
       this.button2.Name = "button2";
-      this.button2.Size = new System.Drawing.Size(88, 23);
+      this.button2.Size = new System.Drawing.Size(108, 26);
       this.button2.TabIndex = 40;
-      this.button2.Text = "RESET";
+      this.button2.Text = "Clear TextBox";
       this.button2.UseVisualStyleBackColor = true;
       this.button2.Click += new System.EventHandler(this.button2_Click);
       // 
@@ -378,7 +377,7 @@
       // 
       this.comboBox1.Anchor = System.Windows.Forms.AnchorStyles.None;
       this.comboBox1.FormattingEnabled = true;
-      this.comboBox1.Location = new System.Drawing.Point(348, 250);
+      this.comboBox1.Location = new System.Drawing.Point(348, 245);
       this.comboBox1.Name = "comboBox1";
       this.comboBox1.Size = new System.Drawing.Size(56, 21);
       this.comboBox1.TabIndex = 37;
@@ -389,7 +388,7 @@
       this.button1.Anchor = System.Windows.Forms.AnchorStyles.None;
       this.button1.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
       this.button1.Font = new System.Drawing.Font("Times New Roman", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.button1.Location = new System.Drawing.Point(137, 290);
+      this.button1.Location = new System.Drawing.Point(123, 303);
       this.button1.Name = "button1";
       this.button1.Size = new System.Drawing.Size(88, 23);
       this.button1.TabIndex = 39;
@@ -686,7 +685,6 @@
       this.tabPage2.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("tabPage2.BackgroundImage")));
       this.tabPage2.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Stretch;
       this.tabPage2.Controls.Add(this.button7);
-      this.tabPage2.Controls.Add(this.button6);
       this.tabPage2.Controls.Add(this.button5);
       this.tabPage2.Controls.Add(this.dataGridView1);
       this.tabPage2.Location = new System.Drawing.Point(4, 22);
@@ -702,26 +700,13 @@
       this.button7.Anchor = System.Windows.Forms.AnchorStyles.None;
       this.button7.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
       this.button7.Font = new System.Drawing.Font("Times New Roman", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.button7.Location = new System.Drawing.Point(623, 106);
+      this.button7.Location = new System.Drawing.Point(623, 59);
       this.button7.Name = "button7";
       this.button7.Size = new System.Drawing.Size(162, 23);
       this.button7.TabIndex = 46;
       this.button7.Text = "Plot Graph";
       this.button7.UseVisualStyleBackColor = true;
       this.button7.Click += new System.EventHandler(this.button7_Click_1);
-      // 
-      // button6
-      // 
-      this.button6.Anchor = System.Windows.Forms.AnchorStyles.None;
-      this.button6.FlatStyle = System.Windows.Forms.FlatStyle.Popup;
-      this.button6.Font = new System.Drawing.Font("Times New Roman", 11.25F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-      this.button6.Location = new System.Drawing.Point(623, 68);
-      this.button6.Name = "button6";
-      this.button6.Size = new System.Drawing.Size(162, 23);
-      this.button6.TabIndex = 45;
-      this.button6.Text = "RESET";
-      this.button6.UseVisualStyleBackColor = true;
-      this.button6.Click += new System.EventHandler(this.button6_Click);
       // 
       // button5
       // 
@@ -906,7 +891,6 @@
         private System.Windows.Forms.ToolTip toolTip1;
         private System.Windows.Forms.ToolTip toolTip3;
         private System.Windows.Forms.DataGridView dataGridView1;
-        private System.Windows.Forms.Button button6;
         private System.Windows.Forms.Button button5;
         private System.Windows.Forms.TabPage tabPage1;
         private System.Windows.Forms.Button button3;

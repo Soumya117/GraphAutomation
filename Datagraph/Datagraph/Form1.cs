@@ -19,7 +19,6 @@ namespace datagraph
   public partial class Form1 : Form
   {
     static string selectedPath;
-    private static double i, j, k;
     Boolean isDefaultLoc = true;
     Boolean isRoot = true;
     DataTable dataTable = new DataTable();
@@ -27,28 +26,6 @@ namespace datagraph
     {
       InitializeComponent();
       populateInitialValues();
-    }
-
-    private void populateInitialValues()
-    {
-      folderBrowserDialog2 = new FolderBrowserDialog();
-      dataTable.Columns.Add("Radius(r)");
-      dataTable.Columns.Add("Tangential Stress");
-      dataTable.Columns.Add("Longitudinal Stress");
-      dataTable.Columns.Add("Radial Stress");
-      comboBox1.Items.Add("Yes");
-      comboBox1.Items.Add("No");
-      label10.Text = DateTime.Now.ToString();
-      monthCalendar1.Visible = false;
-      button3.Visible = false;
-      toolTip1.SetToolTip(this.label10, "Click to display the calendar");
-      toolTip2.SetToolTip(this.button1, "Click to compute the results");
-      toolTip1.SetToolTip(this.button2, "Click to reset the textboxes");
-      SetStyle(ControlStyles.AllPaintingInWmPaint |
-               ControlStyles.DoubleBuffer |
-               ControlStyles.ResizeRedraw |
-               ControlStyles.UserPaint,
-               true);
     }
 
     protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
@@ -94,10 +71,24 @@ namespace datagraph
 
     private void button1_Click(object sender, EventArgs e)
     {
-      double steps;
-      DataRow dr;
-      double ri, ro, pi, po, r, ts, ls, rs, p1, p2, p3, p4, ls2, ts1, ts2, rs1, rs2;
-      steps = Double.Parse(numericUpDown1.Value.ToString());
+      DataRow dataRow;
+      double
+        inRadius,
+        outRadius,
+        idPressure,
+        odPressure,
+        stressRadius,
+        longitudinalStress,
+        tangentialStessText,
+        stressRadText,
+        radiusGrid = 0,
+        tangentialStressGrid,
+        radialStressGrid;
+
+      dataTable.Clear();
+      resetGraphImage();
+
+      double steps = Double.Parse(numericUpDown1.Value.ToString());
 
       if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrEmpty(textBox2.Text) || string.IsNullOrEmpty(textBox3.Text) || string.IsNullOrEmpty(textBox4.Text) || string.IsNullOrEmpty(textBox5.Text) || comboBox1.Text == "Select" || numericUpDown1.Value == 0)
       {
@@ -105,68 +96,69 @@ namespace datagraph
       }
       else
       {
-        ri = double.Parse(textBox1.Text);
-        ro = double.Parse(textBox2.Text);
-        pi = double.Parse(textBox3.Text);
-        po = double.Parse(textBox4.Text);
-        r = double.Parse(textBox5.Text);
+        inRadius = double.Parse(textBox1.Text);
+        outRadius = double.Parse(textBox2.Text);
+        idPressure = double.Parse(textBox3.Text);
+        odPressure = double.Parse(textBox4.Text);
+        stressRadius = double.Parse(textBox5.Text);
 
-        if (ri < 0 || ro < 0 || pi < 0 || po < 0 || r < 0)
+        if (inRadius < 0 || outRadius < 0 || idPressure < 0 || odPressure < 0 || stressRadius < 0)
         {
           MessageBox.Show("Values should be greater than zero(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
         }
         else
         {
-          if (ri >= ro)
+          if (inRadius >= outRadius)
           {
             MessageBox.Show("Outside diameter shall be greater than or equal to inside diameter\n(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
           }
           else
           {
+            double j = 0, k = 0;
             double interval;
-            interval = ro / steps;
+            interval = outRadius / steps;
             double intrvl = Math.Round(interval, 4);
-            p1 = (pi * ri * ri) - (po * ro * ro);
-            p2 = (ro * ro) - (ri * ri);
-            p3 = (ri * ri * ro * ro) * (po - pi);
-            p4 = (r * r) * (ro * ro - ri * ri);
-            ts = (p1 / p2) - (p3 / p4);
-            ts1 = Math.Round(ts, 4);
+            var p1 = (idPressure * inRadius * inRadius) - (odPressure * outRadius * outRadius);
+            var p2 = (outRadius * outRadius) - (inRadius * inRadius);
+            var p3 = (inRadius * inRadius * outRadius * outRadius) * (odPressure - idPressure);
+            var p4 = (stressRadius * stressRadius) * (outRadius * outRadius - inRadius * inRadius);
+            var tangentialStress = (p1 / p2) - (p3 / p4);
+            tangentialStessText = Math.Round(tangentialStress, 4);
+            textBox6.Text = tangentialStessText.ToString();
 
-            textBox6.Text = ts1.ToString();
             if (comboBox1.Text == "Yes")
             {
-              ls2 = p1 / p2;
-              ls = Math.Round(ls2, 4);
-              textBox7.Text = ls.ToString();
+              var longitudinalStressTmp = p1 / p2;
+              longitudinalStress = Math.Round(longitudinalStressTmp, 4);
+              textBox7.Text = longitudinalStress.ToString();
             }
             else
             {
-              ls = 0;
-              textBox7.Text = ls.ToString();
+              longitudinalStress = 0;
+              textBox7.Text = longitudinalStress.ToString();
             }
-            rs = (p1 / p2) + (p3 / p4);
-            rs1 = Math.Round(rs, 4);
+            var radialStress = (p1 / p2) + (p3 / p4);
+            stressRadText = Math.Round(radialStress, 4);
+            textBox8.Text = stressRadText.ToString();
 
-            textBox8.Text = rs1.ToString();
-            for (i = ri; i <= ro; i += intrvl)
+            for (radiusGrid = inRadius; radiusGrid <= outRadius; radiusGrid += intrvl)
             {
-              p1 = (pi * ri * ri) - (po * ro * ro);
-              p2 = (ro * ro) - (ri * ri);
-              p3 = (ri * ri * ro * ro) * (po - pi);
-              p4 = (i * i) * (ro * ro - ri * ri);
+              p1 = (idPressure * inRadius * inRadius) - (odPressure * outRadius * outRadius);
+              p2 = (outRadius * outRadius) - (inRadius * inRadius);
+              p3 = (inRadius * inRadius * outRadius * outRadius) * (odPressure - idPressure);
+              p4 = (radiusGrid * radiusGrid) * (outRadius * outRadius - inRadius * inRadius);
               double tsn = (p1 / p2) - (p3 / p4);
-              ts2 = Math.Round(tsn, 4);
+              tangentialStressGrid = Math.Round(tsn, 4);
               double rsn = (p1 / p2) + (p3 / p4);
-              rs2 = Math.Round(rsn, 4);
-              dr = this.dataTable.NewRow();
-              this.dataTable.Rows.Add(dr);
+              radialStressGrid = Math.Round(rsn, 4);
+              dataRow = this.dataTable.NewRow();
+              this.dataTable.Rows.Add(dataRow);
               while (j <= k)
               {
-                dr[0] = i;
-                dr[1] = ts2;
-                dr[2] = ls;
-                dr[3] = rs2;
+                dataRow[0] = radiusGrid;
+                dataRow[1] = tangentialStressGrid;
+                dataRow[2] = longitudinalStress;
+                dataRow[3] = radialStressGrid;
                 dataGridView1.DataSource = dataTable;
                 j++;
               }
@@ -189,6 +181,107 @@ namespace datagraph
         FormUtil.ClearTextBoxes(Controls);
         numericUpDown1.Value = 0;
       }
+    }
+
+    private void button3_Click(object sender, EventArgs e)
+    {
+      monthCalendar1.Visible = false;
+      button3.Visible = false;
+    }
+
+    private void button5_Click_1(object sender, EventArgs e)
+    {
+      graphext();
+    }
+
+    private void button7_Click_1(object sender, EventArgs e)
+    {
+      string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
+      path = path + "\\" + folderdate;
+
+      if (!Directory.Exists(path))
+      {
+        System.IO.Directory.CreateDirectory(path);
+      }
+
+      string filename = @path + "\\exprt.xls";
+      string imagenew = @path + "\\Image.jpeg";
+      string exclimage = @path + "\\exclimg.xls";
+
+      object misValue = System.Reflection.Missing.Value;
+      Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
+      Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
+      Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
+
+      // see the excel sheet behind the program
+      app.Visible = false;
+      try
+      {
+        worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets["Sheet1"];
+        worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.ActiveSheet;
+        worksheet.Name = "Exported from gridview";
+
+        for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
+        {
+          worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
+        }
+
+        for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
+        {
+          for (int j = 0; j < dataGridView1.Columns.Count; j++)
+          {
+            worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
+          }
+        }
+
+        workbook.SaveAs(filename, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
+        workbook = app.Workbooks.Open(filename, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+        worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(1);
+
+        Excel.Range chartRange;
+        Excel.ChartObjects xlCharts = (Excel.ChartObjects)worksheet.ChartObjects(Type.Missing);
+        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
+        Excel.Chart chartPage = myChart.Chart;
+        myChart.Height = 700;
+        myChart.Width = 1000;
+        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
+        chartRange = worksheet.get_Range("A1", "D2000");
+        chartPage.SetSourceData(chartRange, misValue);
+        chartPage.Export(imagenew, "JPEG", misValue);
+        Image image = Image.FromFile(imagenew);
+        pictureBox1.Image = image;
+        workbook.SaveAs(exclimage, Type.Missing,
+          Type.Missing, Type.Missing,
+          Type.Missing, Type.Missing,
+          Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive,
+          Type.Missing, Type.Missing,
+          Type.Missing, Type.Missing,
+          Type.Missing);
+        workbook.Close(true, misValue, misValue);
+      }
+      catch (System.Exception ex)
+      {
+        MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+      finally
+      {
+        app.Quit();
+        releaseObject(worksheet);
+        releaseObject(workbook);
+        releaseObject(app);
+      }
+    }
+
+    private void button8_Click(object sender, EventArgs e)
+    {
+      saveFileDialog1.Filter = "Bitmap Image (.bmp)|*.bmp|Gif Image (.gif)|*.gif|JPEG Image (.jpeg)|*.jpeg|Png Image (.png)|*.png|Tiff Image (.tiff)|*.tiff|Wmf Image (.wmf)|*.wmf";
+      if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+      {
+        pictureBox1.Image.Save(saveFileDialog1.FileName, ImageFormat.Jpeg);
+      }
+      else
+        return;
     }
 
     private void exitToolStripMenuItem_Click(object sender, EventArgs e)
@@ -238,21 +331,6 @@ namespace datagraph
       FormUtil.verifyTextBoxInputIsNum(textBox5);
     }
 
-    private void button3_Click(object sender, EventArgs e)
-    {
-      monthCalendar1.Visible = false;
-      button3.Visible = false;
-    }
-    protected override CreateParams CreateParams
-    {
-      get
-      {
-        CreateParams cp = base.CreateParams;
-        cp.ExStyle = cp.ExStyle | 0x2000000;
-        return cp;
-      }
-    }
-
     private void label10_Click(object sender, EventArgs e)
     {
       monthCalendar1.Visible = true;
@@ -267,131 +345,6 @@ namespace datagraph
     private void contactToolStripMenuItem_Click(object sender, EventArgs e)
     {
       MessageBox.Show("Contact At: \n Email ID: soumya113157@nitp.ac.in", "Contact", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
-    }
-
-    private void button5_Click(object sender, EventArgs e)
-    {
-
-      object misValue = System.Reflection.Missing.Value;
-      Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
-      Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
-      Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
-      // see the excel sheet behind the program
-      app.Visible = false;
-      try
-      {
-        worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets["Sheet1"];
-        worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.ActiveSheet;
-        worksheet.Name = "Exported from gridview";
-
-        for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-        {
-          worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
-        }
-
-        for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
-        {
-          for (int j = 0; j < dataGridView1.Columns.Count; j++)
-          {
-            worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
-          }
-        }
-
-        // save the application
-        string fileName = String.Empty;
-        SaveFileDialog saveFileExcel = new SaveFileDialog();
-
-        saveFileExcel.Filter = "Excel files |*.xls|All files (*.*)|*.*";
-        saveFileExcel.FilterIndex = 2;
-        saveFileExcel.RestoreDirectory = true;
-
-        if (saveFileExcel.ShowDialog() == DialogResult.OK)
-        {
-          fileName = saveFileExcel.FileName;
-          workbook.SaveAs(fileName, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-
-        }
-        else
-          return;
-
-        workbook = app.Workbooks.Open(fileName, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-        worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(1);
-        Excel.Range chartRange;
-
-        Excel.ChartObjects xlCharts = (Excel.ChartObjects)worksheet.ChartObjects(Type.Missing);
-        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-        Excel.Chart chartPage = myChart.Chart;
-
-        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-        chartRange = worksheet.get_Range("A1", "D1000");
-        chartPage.SetSourceData(chartRange, misValue);
-        chartPage.Export("D:\\Image.jpeg", "JPEG", misValue);
-        Image image = Image.FromFile("D:\\Image.jpeg");
-        pictureBox1.Image = image;
-      }
-      catch (System.Exception ex)
-      {
-
-      }
-      finally
-      {
-        app.Quit();
-        workbook = null;
-        app = null;
-      }
-    }
-
-    private void graph()
-    {
-      Excel.Application xlApp;
-      Excel.Workbook xlWorkBook;
-      Excel.Worksheet xlWorkSheet;
-      object misValue = System.Reflection.Missing.Value;
-
-      xlApp = new Excel.Application();
-      xlWorkBook = xlApp.Workbooks.Open("D:\\csharp.net-informations2.xls", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-      xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
-
-      Excel.Range chartRange;
-
-      Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
-      Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-      Excel.Chart chartPage = myChart.Chart;
-
-      chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-      chartRange = xlWorkSheet.get_Range("A1", "D30");
-      chartPage.SetSourceData(chartRange, misValue);
-      chartPage.Export("D:\\Image.jpeg", "JPEG", misValue);
-      Image image = Image.FromFile("D:\\Image.jpeg");
-      pictureBox1.Image = image;
-      xlWorkBook.Close(true, misValue, misValue);
-      xlApp.Quit();
-
-      releaseObject(xlWorkSheet);
-      releaseObject(xlWorkBook);
-      releaseObject(xlApp);
-    }
-
-    private void releaseObject(object obj)
-    {
-      try
-      {
-        System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-        obj = null;
-      }
-      catch (Exception ex)
-      {
-        obj = null;
-        MessageBox.Show("Unable to release the Object " + ex.ToString());
-      }
-      finally
-      {
-        GC.Collect();
-      }
-    }
-    private void button6_Click(object sender, EventArgs e)
-    {
-      dataTable.Clear();
     }
 
     private void toolStripMenuItem2_Click(object sender, EventArgs e)
@@ -432,168 +385,6 @@ namespace datagraph
       MessageBox.Show("Compute(CTRL+C)\nInsert(CTRL+I)\nReset(CTRL+N)\nShow Calendar(CTRL+D)\nHide Calendar(CTRL+H)\nEXIT(CTRL+E)\nRules(CTRL+R)\nShortCut Keys(CTRL+S)\nHelp Menu(CTRL+F1)\nView Menu(CTRL+V)", "Access Keys", MessageBoxButtons.OK, MessageBoxIcon.Information);
     }
 
-    private void button7_Click_1(object sender, EventArgs e)
-    {
-      string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
-      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
-      path = path + "\\" + folderdate;
-
-      if (!Directory.Exists(path))
-      {
-        System.IO.Directory.CreateDirectory(path);
-      }
-
-      string filename = @path + "\\exprt.xls";
-      string imagenew = @path + "\\Image.jpeg";
-      string exclimage = @path + "\\exclimg.xls";
-
-      object misValue = System.Reflection.Missing.Value;
-      Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
-      Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
-      Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
-
-      // see the excel sheet behind the program
-      app.Visible = false;
-      worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets["Sheet1"];
-      worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.ActiveSheet;
-      worksheet.Name = "Exported from gridview";
-
-      for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-      {
-        worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
-      }
-
-      for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
-      {
-        for (int j = 0; j < dataGridView1.Columns.Count; j++)
-        {
-          worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
-        }
-      }
-
-      workbook.SaveAs(filename, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-      workbook = app.Workbooks.Open(filename, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-      worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(1);
-
-      Excel.Range chartRange;
-
-      Excel.ChartObjects xlCharts = (Excel.ChartObjects)worksheet.ChartObjects(Type.Missing);
-      Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-      Excel.Chart chartPage = myChart.Chart;
-      myChart.Height = 700;
-      myChart.Width = 1000;
-      chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-      chartRange = worksheet.get_Range("A1", "D2000");
-      chartPage.SetSourceData(chartRange, misValue);
-      //chartPage.ChartArea
-      chartPage.Export(imagenew, "JPEG", misValue);
-      Image image = Image.FromFile(imagenew);
-      pictureBox1.Image = image;
-      workbook.SaveAs(exclimage, Type.Missing,
-        Type.Missing, Type.Missing,
-        Type.Missing, Type.Missing,
-        Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive,
-        Type.Missing, Type.Missing,
-        Type.Missing, Type.Missing,
-        Type.Missing);
-      workbook.Close(true, misValue, misValue);
-      //  }
-      //  catch (System.Exception ex)
-      //  {
-      //      MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-      //  }
-      //  finally
-      //  {
-      app.Quit();
-      releaseObject(worksheet);
-      releaseObject(workbook);
-      releaseObject(app);
-
-      workbook = null;
-      app = null;
-      // workbook.Close(true, misValue, misValue);
-      //}
-    }
-    private void button5_Click_1(object sender, EventArgs e)
-    {
-      graphext();
-    }
-    private void graphext()
-    {
-      string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
-      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
-      path = path + "\\" + folderdate;
-
-      if (!Directory.Exists(path))
-      {
-        System.IO.Directory.CreateDirectory(path);
-      }
-
-      string imagenew = path + "\\Image.jpeg";
-      string exclimage = path + "\\exclimg.xls";
-
-      Excel.Application xlApp;
-      Excel.Workbook xlWorkBook;
-      Excel.Worksheet xlWorkSheet;
-      object misValue = System.Reflection.Missing.Value;
-
-      openFileDialog1.FileName = String.Empty;
-      openFileDialog1.Filter = "Excel Sheet(.xls)|*.xls|Microsoft Excel Sheets(.xlsx)|*.xlsx";
-
-      if (openFileDialog1.ShowDialog() == DialogResult.OK)
-      {
-
-        xlApp = new Excel.Application();
-        xlApp.DisplayAlerts = false;
-        xlApp.Visible = false;
-        xlWorkBook = xlApp.Workbooks.Open(openFileDialog1.FileName, 0, true, 5, "", "", true,
-          Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-        xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
-      }
-      else
-        return;
-
-      Excel.Range chartRange;
-      Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
-      Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-      Excel.Chart chartPage = myChart.Chart;
-
-
-      chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-      chartRange = xlWorkSheet.get_Range("A1", "D2000");
-      chartPage.SetSourceData(chartRange, misValue);
-      myChart.Height = 700;
-      myChart.Width = 1024;
-      chartPage.Export(imagenew, "JPEG", misValue);
-      Image image = Image.FromFile(imagenew);
-      pictureBox1.Image = image;
-
-      xlWorkBook.SaveAs(exclimage, Type.Missing,
-        Type.Missing, Type.Missing,
-        Type.Missing, Type.Missing,
-        Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive,
-        Type.Missing, Type.Missing,
-        Type.Missing, Type.Missing,
-        Type.Missing);
-      xlWorkBook.Close(true, misValue, misValue);
-      xlApp.Quit();
-
-      releaseObject(xlWorkSheet);
-      releaseObject(xlWorkBook);
-      releaseObject(xlApp);
-    }
-
-    private void button8_Click(object sender, EventArgs e)
-    {
-      saveFileDialog1.Filter = "Bitmap Image (.bmp)|*.bmp|Gif Image (.gif)|*.gif|JPEG Image (.jpeg)|*.jpeg|Png Image (.png)|*.png|Tiff Image (.tiff)|*.tiff|Wmf Image (.wmf)|*.wmf";
-      if (saveFileDialog1.ShowDialog() == DialogResult.OK)
-      {
-        pictureBox1.Image.Save(saveFileDialog1.FileName, ImageFormat.Jpeg);
-      }
-      else
-        return;
-    }
-
     private void goToFolderToolStripMenuItem_Click(object sender, EventArgs e)
     {
       string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
@@ -611,7 +402,7 @@ namespace datagraph
     private void manageSpaceToolStripMenuItem_Click(object sender, EventArgs e)
     {
       string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
-   
+
       if (MessageBox.Show("Delete all the files?", "Manage Space", MessageBoxButtons.OKCancel) == DialogResult.OK)
       {
         if (pictureBox1.Image != null)
@@ -626,31 +417,16 @@ namespace datagraph
         if (Directory.Exists(path))
         {
 
-          DeleteDirectory(path);
+          FormUtil.DeleteDirectory(path);
           MessageBox.Show("Directory successfully deleted", "Information", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
         else
         {
           MessageBox.Show("Folder Doesnt Exist", "Info", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
-
       }
       else
         return;
-    }
-
-    private void DeleteDirectory(string path)
-    {
-
-      foreach (string filename in Directory.GetFiles(path))
-      {
-        File.Delete(filename);
-      }
-      foreach (string subfolder in Directory.GetDirectories(path))
-      {
-        DeleteDirectory(subfolder);
-      }
-      Directory.Delete(path);
     }
 
     private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
@@ -711,19 +487,6 @@ namespace datagraph
       isRoot = true;
     }
 
-    private void reset()
-    {
-      dataTable.Clear();
-      comboBox1.Text = "Select";
-      FormUtil.ClearTextBoxes(Controls);
-      if (pictureBox1.Image != null)
-      {
-        pictureBox1.Image.Dispose();
-        pictureBox1.Image = null;
-        pictureBox1.ResetText();
-      }
-    }
-
     private void resetToolStripMenuItem_Click(object sender, EventArgs e)
     {
       if (pictureBox1.Image != null)
@@ -732,7 +495,186 @@ namespace datagraph
         pictureBox1.Image = null;
         pictureBox1.ResetText();
       }
+    }
 
+    //////////////////////////////////    private user defined methods    //////////////////////////////////////////////
+
+    protected override CreateParams CreateParams
+    {
+      get
+      {
+        CreateParams cp = base.CreateParams;
+        cp.ExStyle = cp.ExStyle | 0x2000000;
+        return cp;
+      }
+    }
+
+    private void populateInitialValues()
+    {
+      folderBrowserDialog2 = new FolderBrowserDialog();
+      dataTable.Columns.Add("Radius(r)");
+      dataTable.Columns.Add("Tangential Stress");
+      dataTable.Columns.Add("Longitudinal Stress");
+      dataTable.Columns.Add("Radial Stress");
+      comboBox1.Items.Add("Yes");
+      comboBox1.Items.Add("No");
+      label10.Text = DateTime.Now.ToString();
+      monthCalendar1.Visible = false;
+      button3.Visible = false;
+      toolTip1.SetToolTip(this.label10, "Click to display the calendar");
+      toolTip2.SetToolTip(this.button1, "Click to compute the results");
+      toolTip1.SetToolTip(this.button2, "Click to reset the textboxes");
+      SetStyle(ControlStyles.AllPaintingInWmPaint |
+               ControlStyles.DoubleBuffer |
+               ControlStyles.ResizeRedraw |
+               ControlStyles.UserPaint,
+               true);
+    }
+
+    private void graph()
+    {
+      Excel.Application xlApp = null;
+      Excel.Workbook xlWorkBook = null;
+      Excel.Worksheet xlWorkSheet = null;
+      object misValue = System.Reflection.Missing.Value;
+      try
+      {
+        xlApp = new Excel.Application();
+        xlWorkBook = xlApp.Workbooks.Open("D:\\csharp.net-informations2.xls", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+        xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+
+        Excel.Range chartRange;
+        Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
+        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
+        Excel.Chart chartPage = myChart.Chart;
+
+        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
+        chartRange = xlWorkSheet.get_Range("A1", "D30");
+        chartPage.SetSourceData(chartRange, misValue);
+        chartPage.Export("D:\\Image.jpeg", "JPEG", misValue);
+        Image image = Image.FromFile("D:\\Image.jpeg");
+        pictureBox1.Image = image;
+        xlWorkBook.Close(true, misValue, misValue);
+      }
+      catch (System.Exception ex)
+      {
+        MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+      finally
+      {
+        xlApp.Quit();
+        releaseObject(xlWorkSheet);
+        releaseObject(xlWorkBook);
+        releaseObject(xlApp);
+      }
+    }
+
+    private void graphext()
+    {
+      string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
+      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
+      path = path + "\\" + folderdate;
+
+      if (!Directory.Exists(path))
+      {
+        System.IO.Directory.CreateDirectory(path);
+      }
+
+      string imagenew = path + "\\Image.jpeg";
+      string exclimage = path + "\\exclimg.xls";
+
+      Excel.Application xlApp = null;
+      Excel.Workbook xlWorkBook = null;
+      Excel.Worksheet xlWorkSheet = null;
+      try
+      {
+        object misValue = System.Reflection.Missing.Value;
+        openFileDialog1.FileName = String.Empty;
+        openFileDialog1.Filter = "Excel Sheet(.xls)|*.xls|Microsoft Excel Sheets(.xlsx)|*.xlsx";
+
+        if (openFileDialog1.ShowDialog() == DialogResult.OK)
+        {
+          xlApp = new Excel.Application();
+          xlApp.DisplayAlerts = false;
+          xlApp.Visible = false;
+          xlWorkBook = xlApp.Workbooks.Open(openFileDialog1.FileName, 0, true, 5, "", "", true,
+            Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+          xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+        }
+        else
+          return;
+
+        Excel.Range chartRange;
+        Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
+        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
+        Excel.Chart chartPage = myChart.Chart;
+
+
+        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
+        chartRange = xlWorkSheet.get_Range("A1", "D2000");
+        chartPage.SetSourceData(chartRange, misValue);
+        myChart.Height = 700;
+        myChart.Width = 1024;
+        chartPage.Export(imagenew, "JPEG", misValue);
+        Image image = Image.FromFile(imagenew);
+        pictureBox1.Image = image;
+
+        xlWorkBook.SaveAs(exclimage, Type.Missing,
+          Type.Missing, Type.Missing,
+          Type.Missing, Type.Missing,
+          Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive,
+          Type.Missing, Type.Missing,
+          Type.Missing, Type.Missing,
+          Type.Missing);
+        xlWorkBook.Close(true, misValue, misValue);
+      }
+      catch (System.Exception ex)
+      {
+        MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
+      finally
+      {
+        xlApp.Quit();
+        releaseObject(xlWorkSheet);
+        releaseObject(xlWorkBook);
+        releaseObject(xlApp);
+      }
+    }
+
+    private void releaseObject(object obj)
+    {
+      try
+      {
+        System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
+        obj = null;
+      }
+      catch (Exception ex)
+      {
+        obj = null;
+        MessageBox.Show("Unable to release the Object " + ex.ToString());
+      }
+      finally
+      {
+        GC.Collect();
+      }
+    }
+
+    private void reset()
+    {
+      dataTable.Clear();
+      comboBox1.Text = "Select";
+      FormUtil.ClearTextBoxes(Controls);
+      resetGraphImage();
+    }
+
+    private void resetGraphImage()
+    {
+      if (pictureBox1.Image != null)
+      {
+        pictureBox1.Image.Dispose();
+        pictureBox1.Image = null;
+        pictureBox1.ResetText();
+      }
     }
   }
 }
