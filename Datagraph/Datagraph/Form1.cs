@@ -22,6 +22,7 @@ namespace datagraph
     Boolean isDefaultLoc = true;
     Boolean isRoot = true;
     DataTable dataTable = new DataTable();
+    ExcelObject excelObject = new ExcelObject();
     public Form1()
     {
       InitializeComponent();
@@ -71,102 +72,7 @@ namespace datagraph
 
     private void button1_Click(object sender, EventArgs e)
     {
-      DataRow dataRow;
-      double
-        inRadius,
-        outRadius,
-        idPressure,
-        odPressure,
-        stressRadius,
-        longitudinalStress,
-        tangentialStessText,
-        stressRadText,
-        radiusGrid = 0,
-        tangentialStressGrid,
-        radialStressGrid;
-
-      dataTable.Clear();
-      resetGraphImage();
-
-      double steps = Double.Parse(numericUpDown1.Value.ToString());
-
-      if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrEmpty(textBox2.Text) || string.IsNullOrEmpty(textBox3.Text) || string.IsNullOrEmpty(textBox4.Text) || string.IsNullOrEmpty(textBox5.Text) || comboBox1.Text == "Select" || numericUpDown1.Value == 0)
-      {
-        MessageBox.Show("Some fields are empty(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-      }
-      else
-      {
-        inRadius = double.Parse(textBox1.Text);
-        outRadius = double.Parse(textBox2.Text);
-        idPressure = double.Parse(textBox3.Text);
-        odPressure = double.Parse(textBox4.Text);
-        stressRadius = double.Parse(textBox5.Text);
-
-        if (inRadius < 0 || outRadius < 0 || idPressure < 0 || odPressure < 0 || stressRadius < 0)
-        {
-          MessageBox.Show("Values should be greater than zero(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-        }
-        else
-        {
-          if (inRadius >= outRadius)
-          {
-            MessageBox.Show("Outside diameter shall be greater than or equal to inside diameter\n(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
-          }
-          else
-          {
-            double j = 0, k = 0;
-            double interval;
-            interval = outRadius / steps;
-            double intrvl = Math.Round(interval, 4);
-            var p1 = (idPressure * inRadius * inRadius) - (odPressure * outRadius * outRadius);
-            var p2 = (outRadius * outRadius) - (inRadius * inRadius);
-            var p3 = (inRadius * inRadius * outRadius * outRadius) * (odPressure - idPressure);
-            var p4 = (stressRadius * stressRadius) * (outRadius * outRadius - inRadius * inRadius);
-            var tangentialStress = (p1 / p2) - (p3 / p4);
-            tangentialStessText = Math.Round(tangentialStress, 4);
-            textBox6.Text = tangentialStessText.ToString();
-
-            if (comboBox1.Text == "Yes")
-            {
-              var longitudinalStressTmp = p1 / p2;
-              longitudinalStress = Math.Round(longitudinalStressTmp, 4);
-              textBox7.Text = longitudinalStress.ToString();
-            }
-            else
-            {
-              longitudinalStress = 0;
-              textBox7.Text = longitudinalStress.ToString();
-            }
-            var radialStress = (p1 / p2) + (p3 / p4);
-            stressRadText = Math.Round(radialStress, 4);
-            textBox8.Text = stressRadText.ToString();
-
-            for (radiusGrid = inRadius; radiusGrid <= outRadius; radiusGrid += intrvl)
-            {
-              p1 = (idPressure * inRadius * inRadius) - (odPressure * outRadius * outRadius);
-              p2 = (outRadius * outRadius) - (inRadius * inRadius);
-              p3 = (inRadius * inRadius * outRadius * outRadius) * (odPressure - idPressure);
-              p4 = (radiusGrid * radiusGrid) * (outRadius * outRadius - inRadius * inRadius);
-              double tsn = (p1 / p2) - (p3 / p4);
-              tangentialStressGrid = Math.Round(tsn, 4);
-              double rsn = (p1 / p2) + (p3 / p4);
-              radialStressGrid = Math.Round(rsn, 4);
-              dataRow = this.dataTable.NewRow();
-              this.dataTable.Rows.Add(dataRow);
-              while (j <= k)
-              {
-                dataRow[0] = radiusGrid;
-                dataRow[1] = tangentialStressGrid;
-                dataRow[2] = longitudinalStress;
-                dataRow[3] = radialStressGrid;
-                dataGridView1.DataSource = dataTable;
-                j++;
-              }
-              k = k + 4;
-            }
-          }
-        }
-      }
+      calculateResults();
     }
 
     private void button2_Click(object sender, EventArgs e)
@@ -196,81 +102,7 @@ namespace datagraph
 
     private void button7_Click_1(object sender, EventArgs e)
     {
-      string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
-      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
-      path = path + "\\" + folderdate;
-
-      if (!Directory.Exists(path))
-      {
-        System.IO.Directory.CreateDirectory(path);
-      }
-
-      string filename = @path + "\\exprt.xls";
-      string imagenew = @path + "\\Image.jpeg";
-      string exclimage = @path + "\\exclimg.xls";
-
-      object misValue = System.Reflection.Missing.Value;
-      Microsoft.Office.Interop.Excel._Application app = new Microsoft.Office.Interop.Excel.Application();
-      Microsoft.Office.Interop.Excel._Workbook workbook = app.Workbooks.Add(Type.Missing);
-      Microsoft.Office.Interop.Excel._Worksheet worksheet = null;
-
-      // see the excel sheet behind the program
-      app.Visible = false;
-      try
-      {
-        worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.Sheets["Sheet1"];
-        worksheet = (Microsoft.Office.Interop.Excel.Worksheet)workbook.ActiveSheet;
-        worksheet.Name = "Exported from gridview";
-
-        for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-        {
-          worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
-        }
-
-        for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
-        {
-          for (int j = 0; j < dataGridView1.Columns.Count; j++)
-          {
-            worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
-          }
-        }
-
-        workbook.SaveAs(filename, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-        workbook = app.Workbooks.Open(filename, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-        worksheet = (Excel.Worksheet)workbook.Worksheets.get_Item(1);
-
-        Excel.Range chartRange;
-        Excel.ChartObjects xlCharts = (Excel.ChartObjects)worksheet.ChartObjects(Type.Missing);
-        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-        Excel.Chart chartPage = myChart.Chart;
-        myChart.Height = 700;
-        myChart.Width = 1000;
-        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-        chartRange = worksheet.get_Range("A1", "D2000");
-        chartPage.SetSourceData(chartRange, misValue);
-        chartPage.Export(imagenew, "JPEG", misValue);
-        Image image = Image.FromFile(imagenew);
-        pictureBox1.Image = image;
-        workbook.SaveAs(exclimage, Type.Missing,
-          Type.Missing, Type.Missing,
-          Type.Missing, Type.Missing,
-          Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive,
-          Type.Missing, Type.Missing,
-          Type.Missing, Type.Missing,
-          Type.Missing);
-        workbook.Close(true, misValue, misValue);
-      }
-      catch (System.Exception ex)
-      {
-        MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-      }
-      finally
-      {
-        app.Quit();
-        releaseObject(worksheet);
-        releaseObject(workbook);
-        releaseObject(app);
-      }
+      graph();
     }
 
     private void button8_Click(object sender, EventArgs e)
@@ -461,7 +293,6 @@ namespace datagraph
 
     private void changeFolderDestinationToolStripMenuItem_Click(object sender, EventArgs e)
     {
-
       if (folderBrowserDialog2.ShowDialog() == DialogResult.OK)
       {
         selectedPath = folderBrowserDialog2.SelectedPath;
@@ -509,6 +340,105 @@ namespace datagraph
       }
     }
 
+    private void calculateResults()
+    {
+      DataRow dataRow;
+      double
+        inRadius,
+        outRadius,
+        idPressure,
+        odPressure,
+        stressRadius,
+        longitudinalStress,
+        tangentialStessText,
+        stressRadText,
+        radiusGrid = 0,
+        tangentialStressGrid,
+        radialStressGrid;
+
+      dataTable.Clear();
+      resetGraphImage();
+
+      double steps = Double.Parse(numericUpDown1.Value.ToString());
+
+      if (string.IsNullOrEmpty(textBox1.Text) || string.IsNullOrEmpty(textBox2.Text) || string.IsNullOrEmpty(textBox3.Text) || string.IsNullOrEmpty(textBox4.Text) || string.IsNullOrEmpty(textBox5.Text) || comboBox1.Text == "Select" || numericUpDown1.Value == 0)
+      {
+        MessageBox.Show("Some fields are empty(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+      }
+      else
+      {
+        inRadius = double.Parse(textBox1.Text);
+        outRadius = double.Parse(textBox2.Text);
+        idPressure = double.Parse(textBox3.Text);
+        odPressure = double.Parse(textBox4.Text);
+        stressRadius = double.Parse(textBox5.Text);
+
+        if (inRadius < 0 || outRadius < 0 || idPressure < 0 || odPressure < 0 || stressRadius < 0)
+        {
+          MessageBox.Show("Values should be greater than zero(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+        }
+        else
+        {
+          if (inRadius >= outRadius)
+          {
+            MessageBox.Show("Outside diameter shall be greater than or equal to inside diameter\n(See the rules in the View Menu)", "Error", MessageBoxButtons.OK, MessageBoxIcon.Information);
+          }
+          else
+          {
+            double j = 0, k = 0;
+            double interval;
+            interval = outRadius / steps;
+            double intrvl = Math.Round(interval, 4);
+            var p1 = (idPressure * inRadius * inRadius) - (odPressure * outRadius * outRadius);
+            var p2 = (outRadius * outRadius) - (inRadius * inRadius);
+            var p3 = (inRadius * inRadius * outRadius * outRadius) * (odPressure - idPressure);
+            var p4 = (stressRadius * stressRadius) * (outRadius * outRadius - inRadius * inRadius);
+            var tangentialStress = (p1 / p2) - (p3 / p4);
+            tangentialStessText = Math.Round(tangentialStress, 4);
+            textBox6.Text = tangentialStessText.ToString();
+
+            if (comboBox1.Text == "Yes")
+            {
+              var longitudinalStressTmp = p1 / p2;
+              longitudinalStress = Math.Round(longitudinalStressTmp, 4);
+              textBox7.Text = longitudinalStress.ToString();
+            }
+            else
+            {
+              longitudinalStress = 0;
+              textBox7.Text = longitudinalStress.ToString();
+            }
+            var radialStress = (p1 / p2) + (p3 / p4);
+            stressRadText = Math.Round(radialStress, 4);
+            textBox8.Text = stressRadText.ToString();
+
+            for (radiusGrid = inRadius; radiusGrid <= outRadius; radiusGrid += intrvl)
+            {
+              p1 = (idPressure * inRadius * inRadius) - (odPressure * outRadius * outRadius);
+              p2 = (outRadius * outRadius) - (inRadius * inRadius);
+              p3 = (inRadius * inRadius * outRadius * outRadius) * (odPressure - idPressure);
+              p4 = (radiusGrid * radiusGrid) * (outRadius * outRadius - inRadius * inRadius);
+              double tsn = (p1 / p2) - (p3 / p4);
+              tangentialStressGrid = Math.Round(tsn, 4);
+              double rsn = (p1 / p2) + (p3 / p4);
+              radialStressGrid = Math.Round(rsn, 4);
+              dataRow = this.dataTable.NewRow();
+              this.dataTable.Rows.Add(dataRow);
+              while (j <= k)
+              {
+                dataRow[0] = radiusGrid;
+                dataRow[1] = tangentialStressGrid;
+                dataRow[2] = longitudinalStress;
+                dataRow[3] = radialStressGrid;
+                dataGridView1.DataSource = dataTable;
+                j++;
+              }
+              k = k + 4;
+            }
+          }
+        }
+      }
+    }
     private void populateInitialValues()
     {
       folderBrowserDialog2 = new FolderBrowserDialog();
@@ -533,28 +463,29 @@ namespace datagraph
 
     private void graph()
     {
-      Excel.Application xlApp = null;
-      Excel.Workbook xlWorkBook = null;
-      Excel.Worksheet xlWorkSheet = null;
-      object misValue = System.Reflection.Missing.Value;
+      var path = excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
+
+      string filename = @path + "\\exprt.xls";
       try
       {
-        xlApp = new Excel.Application();
-        xlWorkBook = xlApp.Workbooks.Open("D:\\csharp.net-informations2.xls", 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-        xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+        excelObject.configureExcelApp();
+        var worksheet = excelObject.configureWorksheet();
 
-        Excel.Range chartRange;
-        Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
-        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-        Excel.Chart chartPage = myChart.Chart;
+        for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
+        {
+          worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
+        }
 
-        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-        chartRange = xlWorkSheet.get_Range("A1", "D30");
-        chartPage.SetSourceData(chartRange, misValue);
-        chartPage.Export("D:\\Image.jpeg", "JPEG", misValue);
-        Image image = Image.FromFile("D:\\Image.jpeg");
-        pictureBox1.Image = image;
-        xlWorkBook.Close(true, misValue, misValue);
+        for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
+        {
+          for (int j = 0; j < dataGridView1.Columns.Count; j++)
+          {
+            worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
+          }
+        }
+        excelObject.saveToTempExcel(filename);
+        excelObject.configureChartsAndSave();
+        pictureBox1.Image = excelObject.getImage();
       }
       catch (System.Exception ex)
       {
@@ -562,82 +493,37 @@ namespace datagraph
       }
       finally
       {
-        xlApp.Quit();
-        releaseObject(xlWorkSheet);
-        releaseObject(xlWorkBook);
-        releaseObject(xlApp);
+        excelObject.releaseObjects();
       }
     }
 
     private void graphext()
     {
-      string folderdate = DateTime.Now.ToString("yyyy-MM-dd hh_mm_ss");
-      string path = FormUtil.setFilePath(selectedPath, isDefaultLoc, isRoot);
-      path = path + "\\" + folderdate;
-
-      if (!Directory.Exists(path))
-      {
-        System.IO.Directory.CreateDirectory(path);
-      }
-
-      string imagenew = path + "\\Image.jpeg";
-      string exclimage = path + "\\exclimg.xls";
-
-      Excel.Application xlApp = null;
-      Excel.Workbook xlWorkBook = null;
-      Excel.Worksheet xlWorkSheet = null;
+      dataTable.Clear();
+      excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
       try
       {
-        object misValue = System.Reflection.Missing.Value;
         openFileDialog1.FileName = String.Empty;
         openFileDialog1.Filter = "Excel Sheet(.xls)|*.xls|Microsoft Excel Sheets(.xlsx)|*.xlsx";
 
         if (openFileDialog1.ShowDialog() == DialogResult.OK)
         {
-          xlApp = new Excel.Application();
-          xlApp.DisplayAlerts = false;
-          xlApp.Visible = false;
-          xlWorkBook = xlApp.Workbooks.Open(openFileDialog1.FileName, 0, true, 5, "", "", true,
-            Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
-          xlWorkSheet = (Excel.Worksheet)xlWorkBook.Worksheets.get_Item(1);
+          excelObject.configureExcelApp();
+          excelObject.exportExternalFile(openFileDialog1.FileName);
         }
         else
           return;
 
-        Excel.Range chartRange;
-        Excel.ChartObjects xlCharts = (Excel.ChartObjects)xlWorkSheet.ChartObjects(Type.Missing);
-        Excel.ChartObject myChart = (Excel.ChartObject)xlCharts.Add(10, 80, 300, 250);
-        Excel.Chart chartPage = myChart.Chart;
-
-
-        chartPage.ChartType = Excel.XlChartType.xlXYScatterLines;
-        chartRange = xlWorkSheet.get_Range("A1", "D2000");
-        chartPage.SetSourceData(chartRange, misValue);
-        myChart.Height = 700;
-        myChart.Width = 1024;
-        chartPage.Export(imagenew, "JPEG", misValue);
-        Image image = Image.FromFile(imagenew);
-        pictureBox1.Image = image;
-
-        xlWorkBook.SaveAs(exclimage, Type.Missing,
-          Type.Missing, Type.Missing,
-          Type.Missing, Type.Missing,
-          Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive,
-          Type.Missing, Type.Missing,
-          Type.Missing, Type.Missing,
-          Type.Missing);
-        xlWorkBook.Close(true, misValue, misValue);
+        excelObject.configureChartsAndSave();
+        pictureBox1.Image = excelObject.getImage();
       }
       catch (System.Exception ex)
       {
-        MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        MessageBox.Show(ex.ToString(), "Error during exporting data", MessageBoxButtons.OK, MessageBoxIcon.Error);
       }
       finally
       {
-        xlApp.Quit();
-        releaseObject(xlWorkSheet);
-        releaseObject(xlWorkBook);
-        releaseObject(xlApp);
+        excelObject.releaseObjects();
       }
     }
 
