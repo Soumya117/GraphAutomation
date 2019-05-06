@@ -43,10 +43,6 @@ namespace datagraph
       {
         label10_Click(null, null);
       }
-      if (keyData == (Keys.Control | Keys.H))
-      {
-        button3_Click(null, null);
-      }
       if (keyData == (Keys.Control | Keys.F1))
       {
         toolStripMenuItem1.ShowDropDown();
@@ -87,12 +83,6 @@ namespace datagraph
         FormUtil.clearTextBoxes(Controls);
         numericUpDown1.Value = 0;
       }
-    }
-
-    private void button3_Click(object sender, EventArgs e)
-    {
-      monthCalendar1.Visible = false;
-      button3.Visible = false;
     }
 
     private void button5_Click_1(object sender, EventArgs e)
@@ -165,8 +155,7 @@ namespace datagraph
 
     private void label10_Click(object sender, EventArgs e)
     {
-      monthCalendar1.Visible = true;
-      button3.Visible = true;
+      monthCalendar1.Visible = monthCalendar1.Visible ? false : true;
     }
 
     private void rulesToolStripMenuItem_Click(object sender, EventArgs e)
@@ -263,13 +252,16 @@ namespace datagraph
 
     private void saveAsToolStripMenuItem_Click(object sender, EventArgs e)
     {
-      saveFileDialog1.Filter = "Bitmap Image (.bmp)|*.bmp|Gif Image (.gif)|*.gif|JPEG Image (.jpeg)|*.jpeg|Png Image (.png)|*.png|Tiff Image (.tiff)|*.tiff|Wmf Image (.wmf)|*.wmf";
-      if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+      if (pictureBox1.Image != null)
       {
-        pictureBox1.Image.Save(saveFileDialog1.FileName, ImageFormat.Jpeg);
+        saveFileDialog1.Filter = "Bitmap Image (.bmp)|*.bmp|Gif Image (.gif)|*.gif|JPEG Image (.jpeg)|*.jpeg|Png Image (.png)|*.png|Tiff Image (.tiff)|*.tiff|Wmf Image (.wmf)|*.wmf";
+        if (saveFileDialog1.ShowDialog() == DialogResult.OK)
+        {
+          pictureBox1.Image.Save(saveFileDialog1.FileName, ImageFormat.Jpeg);
+        }
+        else
+          return;
       }
-      else
-        return;
     }
 
     private void openFolderToolStripMenuItem_Click(object sender, EventArgs e)
@@ -452,7 +444,6 @@ namespace datagraph
       comboBox1.Items.Add("No");
       label10.Text = DateTime.Now.ToString();
       monthCalendar1.Visible = false;
-      button3.Visible = false;
       toolTip1.SetToolTip(this.label10, "Click to display the calendar");
       toolTip2.SetToolTip(this.button1, "Click to compute the results");
       toolTip1.SetToolTip(this.button2, "Click to reset the textboxes");
