@@ -9,7 +9,7 @@ namespace datagraph
 {
   public static class FormUtil
   {
-    public static void ClearTextBoxes(Control.ControlCollection controls)
+    public static void clearTextBoxes(Control.ControlCollection controls)
     {
       Action<Control.ControlCollection> func = null;
       func = (controls1) =>
@@ -51,7 +51,7 @@ namespace datagraph
       return path;
     }
 
-    public static void DeleteDirectory(string path)
+    public static void deleteDirectory(string path)
     {
       foreach (string filename in Directory.GetFiles(path))
       {
@@ -59,28 +59,9 @@ namespace datagraph
       }
       foreach (string subfolder in Directory.GetDirectories(path))
       {
-        DeleteDirectory(subfolder);
+        deleteDirectory(subfolder);
       }
       Directory.Delete(path);
     }
-
-    public static void releaseObject(object obj)
-    {
-      try
-      {
-        System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-        obj = null;
-      }
-      catch (Exception ex)
-      {
-        obj = null;
-        MessageBox.Show("Unable to release the Object " + ex.ToString());
-      }
-      finally
-      {
-        GC.Collect();
-      }
-    }
-
   }
 }

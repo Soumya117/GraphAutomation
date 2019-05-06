@@ -21,7 +21,7 @@ namespace datagraph
     static string selectedPath;
     Boolean isDefaultLoc = true;
     Boolean isRoot = true;
-    DataTable dataTable = new DataTable();
+    DataTable dataTable = null;
     ExcelObject excelObject = new ExcelObject();
     public Form1()
     {
@@ -84,7 +84,7 @@ namespace datagraph
       else
       {
         comboBox1.Text = "Select";
-        FormUtil.ClearTextBoxes(Controls);
+        FormUtil.clearTextBoxes(Controls);
         numericUpDown1.Value = 0;
       }
     }
@@ -249,7 +249,7 @@ namespace datagraph
         if (Directory.Exists(path))
         {
 
-          FormUtil.DeleteDirectory(path);
+          FormUtil.deleteDirectory(path);
           MessageBox.Show("Directory successfully deleted", "Information", MessageBoxButtons.OK, MessageBoxIcon.Asterisk);
         }
         else
@@ -441,11 +441,13 @@ namespace datagraph
     }
     private void populateInitialValues()
     {
+      dataTable = new DataTable();
       folderBrowserDialog2 = new FolderBrowserDialog();
       dataTable.Columns.Add("Radius(r)");
       dataTable.Columns.Add("Tangential Stress");
       dataTable.Columns.Add("Longitudinal Stress");
       dataTable.Columns.Add("Radial Stress");
+      dataGridView1.DataSource = dataTable;
       comboBox1.Items.Add("Yes");
       comboBox1.Items.Add("No");
       label10.Text = DateTime.Now.ToString();
@@ -463,6 +465,13 @@ namespace datagraph
 
     private void graph()
     {
+      var dataTableCount = System.Convert.ToInt32(dataTable.Rows.Count);
+      if (dataTableCount == 0)
+      {
+        MessageBox.Show("No data points loaded");
+        return;
+      }
+
       var path = excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
 
       string filename = @path + "\\exprt.xls";
@@ -499,8 +508,6 @@ namespace datagraph
 
     private void graphext()
     {
-      dataTable.Clear();
-      excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
       try
       {
         openFileDialog1.FileName = String.Empty;
@@ -508,6 +515,8 @@ namespace datagraph
 
         if (openFileDialog1.ShowDialog() == DialogResult.OK)
         {
+          dataTable.Clear();
+          excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
           excelObject.configureExcelApp();
           excelObject.exportExternalFile(openFileDialog1.FileName);
         }
@@ -549,7 +558,7 @@ namespace datagraph
     {
       dataTable.Clear();
       comboBox1.Text = "Select";
-      FormUtil.ClearTextBoxes(Controls);
+      FormUtil.clearTextBoxes(Controls);
       resetGraphImage();
     }
 

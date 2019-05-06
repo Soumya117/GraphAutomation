@@ -21,7 +21,6 @@ namespace datagraph
 
   class ExcelObject
   {
-
     private Excel.Application app = null;
     private Excel.Workbook workBook = null;
     private Excel.Worksheet workSheet = null;
@@ -120,11 +119,9 @@ namespace datagraph
 
     public void releaseObjects()
     {
-      //TODO fix this crash
-      app.Quit();
-      FormUtil.releaseObject(workSheet);
-      FormUtil.releaseObject(workBook);
-      FormUtil.releaseObject(app);
+      GarbageCollector.releaseObject(workSheet);
+      GarbageCollector.releaseObject(workBook);
+      GarbageCollector.releaseObject(app);
     }
   }
 }
