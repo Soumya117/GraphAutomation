@@ -12,17 +12,16 @@ using System.IO;
 using System.Reflection;
 using System.Web;
 
-using Excel = Microsoft.Office.Interop.Excel;
-
 namespace datagraph
 {
   public partial class Form1 : Form
   {
-    static string selectedPath;
+    string selectedPath;
     Boolean isDefaultLoc = true;
     Boolean isRoot = true;
     DataTable dataTable = null;
     ExcelObject excelObject = new ExcelObject();
+
     public Form1()
     {
       InitializeComponent();
@@ -87,12 +86,29 @@ namespace datagraph
 
     private void button5_Click_1(object sender, EventArgs e)
     {
-      graphext();
+      try
+      {
+        openFileDialog1.FileName = String.Empty;
+        openFileDialog1.Filter = "Excel Sheet(.xls)|*.xls|Microsoft Excel Sheets(.xlsx)|*.xlsx";
+
+        if (openFileDialog1.ShowDialog() == DialogResult.OK)
+        {
+          excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
+          excelObject.plotGraphFromExcel(dataTable, openFileDialog1.FileName);
+        }
+        pictureBox1.Image = excelObject.getImage();
+      }
+      catch (System.Exception ex)
+      {
+        MessageBox.Show(ex.ToString(), "Error during exporting data", MessageBoxButtons.OK, MessageBoxIcon.Error);
+      }
     }
 
     private void button7_Click_1(object sender, EventArgs e)
     {
-      graph();
+      excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
+      excelObject.plotGraphFromDataGrid(dataTable, dataGridView1);
+      pictureBox1.Image = excelObject.getImage();
     }
 
     private void button8_Click(object sender, EventArgs e)
@@ -431,6 +447,7 @@ namespace datagraph
         }
       }
     }
+
     private void populateInitialValues()
     {
       dataTable = new DataTable();
@@ -452,97 +469,6 @@ namespace datagraph
                ControlStyles.ResizeRedraw |
                ControlStyles.UserPaint,
                true);
-    }
-
-    private void graph()
-    {
-      var dataTableCount = System.Convert.ToInt32(dataTable.Rows.Count);
-      if (dataTableCount == 0)
-      {
-        MessageBox.Show("No data points loaded");
-        return;
-      }
-
-      var path = excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
-
-      string filename = @path + "\\exprt.xls";
-      try
-      {
-        excelObject.configureExcelApp();
-        var worksheet = excelObject.configureWorksheet();
-
-        for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-        {
-          worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
-        }
-
-        for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
-        {
-          for (int j = 0; j < dataGridView1.Columns.Count; j++)
-          {
-            worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
-          }
-        }
-        excelObject.saveToTempExcel(filename);
-        excelObject.configureChartsAndSave();
-        pictureBox1.Image = excelObject.getImage();
-      }
-      catch (System.Exception ex)
-      {
-        MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-      }
-      finally
-      {
-        excelObject.releaseObjects();
-      }
-    }
-
-    private void graphext()
-    {
-      try
-      {
-        openFileDialog1.FileName = String.Empty;
-        openFileDialog1.Filter = "Excel Sheet(.xls)|*.xls|Microsoft Excel Sheets(.xlsx)|*.xlsx";
-
-        if (openFileDialog1.ShowDialog() == DialogResult.OK)
-        {
-          dataTable.Clear();
-          excelObject.configurePath(selectedPath, isDefaultLoc, isRoot);
-          excelObject.configureExcelApp();
-          excelObject.exportExternalFile(openFileDialog1.FileName);
-        }
-        else
-          return;
-
-        excelObject.configureChartsAndSave();
-        pictureBox1.Image = excelObject.getImage();
-      }
-      catch (System.Exception ex)
-      {
-        MessageBox.Show(ex.ToString(), "Error during exporting data", MessageBoxButtons.OK, MessageBoxIcon.Error);
-      }
-      finally
-      {
-        excelObject.releaseObjects();
-      }
-    }
-
-    private void releaseObject(object obj)
-    {
-      try
-      {
-        System.Runtime.InteropServices.Marshal.ReleaseComObject(obj);
-        obj = null;
-      }
-      catch (Exception ex)
-      {
-        obj = null;
-        MessageBox.Show("Unable to release the Object " + ex.ToString());
-      }
-      finally
-      {
-        GC.Collect();
-      }
     }
 
     private void reset()
