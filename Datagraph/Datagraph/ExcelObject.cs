@@ -26,7 +26,7 @@ namespace datagraph
     public string selectedPath;
   }
 
-  partial class Form1
+  partial class PlotGraph
   {
     class ExcelObject
     {
@@ -148,14 +148,8 @@ namespace datagraph
         GarbageCollector.releaseObject(app);
       }
 
-      public void plotGraphFromDataGrid(DataTable dataTable, DataGridView dataGridView1)
+      public void plotGraph(DataTable dataTable, DataGridView dataGridView1)
       {
-        var dataTableCount = System.Convert.ToInt32(dataTable.Rows.Count);
-        if (dataTableCount == 0)
-        {
-          MessageBox.Show("No data points loaded");
-          return;
-        }
 
         var path = configurePath();
 
@@ -189,7 +183,7 @@ namespace datagraph
           releaseObjects();
         }
       }
-      public void plotGraphFromExcel(DataTable dataTable, string fileName)
+      public void plotGraph(DataTable dataTable, string fileName)
       {
         try
         {

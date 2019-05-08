@@ -14,7 +14,7 @@ using System.Web;
 
 namespace datagraph
 {
-  public partial class Form1 : Form
+  public partial class PlotGraph : Form
   {
     string selectedPath;
     Boolean isDefaultLoc = true;
@@ -22,7 +22,7 @@ namespace datagraph
     DataTable dataTable = null;
     ExcelObject excelObject = new ExcelObject();
 
-    public Form1()
+    public PlotGraph()
     {
       InitializeComponent();
       populateInitialValues();
@@ -84,6 +84,41 @@ namespace datagraph
       }
     }
 
+    public void InvokeMethod(Delegate method, params object[] args)
+    {
+      resetGraphImage();
+      tabControl1.SelectedIndex = 2;
+      label21.Visible = true;
+      label21.Text = "Plotting Graph..Please wait..";
+      excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
+
+      method.DynamicInvoke(args);
+
+      label21.Visible = false;
+      pictureBox1.Image = excelObject.getImage();
+    }
+
+    private void plotGraph(params object[] args)
+    {
+      resetGraphImage();
+      tabControl1.SelectedIndex = 2;
+      label21.Visible = true;
+      label21.Text = "Plotting Graph..Please wait..";
+      excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
+      var dataTable = (DataTable)args[0];
+      if (args[1] is string)
+      {
+        var varparam = (string)args[1];
+        excelObject.plotGraph(dataTable, varparam);
+      }
+      else
+      {
+        excelObject.plotGraph(dataTable, (DataGridView)args[1]);
+      }
+      label21.Visible = false;
+      pictureBox1.Image = excelObject.getImage();
+    }
+
     private void button5_Click_1(object sender, EventArgs e)
     {
       try
@@ -93,10 +128,8 @@ namespace datagraph
 
         if (openFileDialog1.ShowDialog() == DialogResult.OK)
         {
-          excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
-          excelObject.plotGraphFromExcel(dataTable, openFileDialog1.FileName);
+          Invoke(new Action(() => plotGraph(dataTable, openFileDialog1.FileName)));
         }
-        pictureBox1.Image = excelObject.getImage();
       }
       catch (System.Exception ex)
       {
@@ -106,9 +139,13 @@ namespace datagraph
 
     private void button7_Click_1(object sender, EventArgs e)
     {
-      excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
-      excelObject.plotGraphFromDataGrid(dataTable, dataGridView1);
-      pictureBox1.Image = excelObject.getImage();
+      var dataTableCount = System.Convert.ToInt32(dataTable.Rows.Count);
+      if (dataTableCount == 0)
+      {
+        MessageBox.Show("No data points loaded");
+        return;
+      }
+      Invoke(new Action(() => plotGraph(dataTable, dataGridView1)));
     }
 
     private void button8_Click(object sender, EventArgs e)
@@ -469,6 +506,7 @@ namespace datagraph
                ControlStyles.ResizeRedraw |
                ControlStyles.UserPaint,
                true);
+      label21.Visible = false;
     }
 
     private void reset()

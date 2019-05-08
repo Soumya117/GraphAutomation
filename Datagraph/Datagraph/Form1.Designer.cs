@@ -1,6 +1,6 @@
 ﻿namespace datagraph
 {
-    partial class Form1
+    partial class PlotGraph
     {
         /// <summary>
         /// Required designer variable.
@@ -29,7 +29,7 @@
         private void InitializeComponent()
         {
       this.components = new System.ComponentModel.Container();
-      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(Form1));
+      System.ComponentModel.ComponentResourceManager resources = new System.ComponentModel.ComponentResourceManager(typeof(PlotGraph));
       this.tabControl1 = new System.Windows.Forms.TabControl();
       this.tabPage1 = new System.Windows.Forms.TabPage();
       this.checkBox1 = new System.Windows.Forms.CheckBox();
@@ -106,6 +106,7 @@
       this.saveFileDialog2 = new System.Windows.Forms.SaveFileDialog();
       this.folderBrowserDialog1 = new System.Windows.Forms.FolderBrowserDialog();
       this.folderBrowserDialog2 = new System.Windows.Forms.FolderBrowserDialog();
+      this.label21 = new System.Windows.Forms.Label();
       this.tabControl1.SuspendLayout();
       this.tabPage1.SuspendLayout();
       ((System.ComponentModel.ISupportInitialize)(this.numericUpDown1)).BeginInit();
@@ -718,6 +719,7 @@
       // 
       // tabPage3
       // 
+      this.tabPage3.Controls.Add(this.label21);
       this.tabPage3.Controls.Add(this.pictureBox1);
       this.tabPage3.Controls.Add(this.menuStrip2);
       this.tabPage3.Location = new System.Drawing.Point(4, 22);
@@ -841,7 +843,16 @@
       // 
       this.openFileDialog1.FileName = "openFileDialog1";
       // 
-      // Form1
+      // label21
+      // 
+      this.label21.AutoSize = true;
+      this.label21.Location = new System.Drawing.Point(366, 176);
+      this.label21.Name = "label21";
+      this.label21.Size = new System.Drawing.Size(41, 13);
+      this.label21.TabIndex = 49;
+      this.label21.Text = "label21";
+      // 
+      // PlotGraph
       // 
       this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
       this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
@@ -849,7 +860,7 @@
       this.Controls.Add(this.tabControl1);
       this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
       this.MainMenuStrip = this.menuStrip2;
-      this.Name = "Form1";
+      this.Name = "PlotGraph";
       this.Text = "Compute";
       this.tabControl1.ResumeLayout(false);
       this.tabPage1.ResumeLayout(false);
@@ -946,6 +957,7 @@
         private System.Windows.Forms.ToolStripMenuItem defaultFolderToolStripMenuItem;
         private System.Windows.Forms.CheckBox checkBox1;
         private System.Windows.Forms.ToolStripMenuItem resetToolStripMenuItem;
+        private System.Windows.Forms.Label label21;
     }
 }
 
