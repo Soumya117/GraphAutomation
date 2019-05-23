@@ -126,10 +126,14 @@ namespace datagraph
         openFileDialog1.FileName = String.Empty;
         openFileDialog1.Filter = "Excel Sheet(.xls)|*.xls|Microsoft Excel Sheets(.xlsx)|*.xlsx";
 
-        if (openFileDialog1.ShowDialog() == DialogResult.OK)
+        if (openFileDialog1.ShowDialog() == DialogResult.OK
+          && !String.IsNullOrEmpty(openFileDialog1.FileName))
         {
+          dataTable.Clear();
           Invoke(new Action(() => plotGraph(dataTable, openFileDialog1.FileName)));
         }
+        else
+          return;
       }
       catch (System.Exception ex)
       {

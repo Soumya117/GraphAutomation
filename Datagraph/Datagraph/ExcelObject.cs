@@ -150,7 +150,6 @@ namespace datagraph
 
       public void plotGraph(DataTable dataTable, DataGridView dataGridView1)
       {
-
         var path = configurePath();
 
         string filename = @path + "\\exprt.xls";
@@ -187,16 +186,9 @@ namespace datagraph
       {
         try
         {
-          if (!String.IsNullOrEmpty(fileName))
-          {
-            dataTable.Clear();
-            configurePath();
-            configureExcelApp();
-            exportExternalFile(fileName);
-          }
-          else
-            return;
-
+          configurePath();
+          configureExcelApp();
+          exportExternalFile(fileName);
           configureChartsAndSave();
         }
         catch (System.Exception ex)
