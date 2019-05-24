@@ -84,37 +84,14 @@ namespace datagraph
       }
     }
 
-    public void InvokeMethod(Delegate method, params object[] args)
+    private void plot(IPlotGraph plotGraph)
     {
       resetGraphImage();
       tabControl1.SelectedIndex = 2;
       label21.Visible = true;
       label21.Text = "Plotting Graph..Please wait..";
       excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
-
-      method.DynamicInvoke(args);
-
-      label21.Visible = false;
-      pictureBox1.Image = excelObject.getImage();
-    }
-
-    private void plotGraph(params object[] args)
-    {
-      resetGraphImage();
-      tabControl1.SelectedIndex = 2;
-      label21.Visible = true;
-      label21.Text = "Plotting Graph..Please wait..";
-      excelObject.setDirectoryFlags(isDefaultLoc, isRoot, selectedPath);
-      var dataTable = (DataTable)args[0];
-      if (args[1] is string)
-      {
-        var varparam = (string)args[1];
-        excelObject.plotGraph(dataTable, varparam);
-      }
-      else
-      {
-        excelObject.plotGraph(dataTable, (DataGridView)args[1]);
-      }
+      plotGraph.plot();
       label21.Visible = false;
       pictureBox1.Image = excelObject.getImage();
     }
@@ -130,7 +107,11 @@ namespace datagraph
           && !String.IsNullOrEmpty(openFileDialog1.FileName))
         {
           dataTable.Clear();
-          Invoke(new Action(() => plotGraph(dataTable, openFileDialog1.FileName)));
+          IPlotGraph plotGraph = new PlotGraphExternal(
+            excelObject,
+            dataTable,
+            openFileDialog1.FileName);
+          Invoke(new Action(() => plot(plotGraph)));
         }
         else
           return;
@@ -149,7 +130,11 @@ namespace datagraph
         MessageBox.Show("No data points loaded");
         return;
       }
-      Invoke(new Action(() => plotGraph(dataTable, dataGridView1)));
+      IPlotGraph plotGraph = new PlotGraphFromGrid(
+        excelObject,
+        dataTable,
+        dataGridView1);
+      Invoke(new Action(() => plot(plotGraph)));
     }
 
     private void button8_Click(object sender, EventArgs e)

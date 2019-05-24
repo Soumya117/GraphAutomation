@@ -25,9 +25,6 @@ namespace datagraph
     public bool isRoot;
     public string selectedPath;
   }
-
-  partial class PlotGraph
-  {
     class ExcelObject
     {
       private Excel.Application app = null;
@@ -82,8 +79,23 @@ namespace datagraph
 
       public void saveToTempExcel(string filename)
       {
-        workBook.SaveAs(filename, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Type.Missing, Microsoft.Office.Interop.Excel.XlSaveAsAccessMode.xlExclusive, Type.Missing, Type.Missing, Type.Missing, Type.Missing);
-        workBook = app.Workbooks.Open(filename, 0, true, 5, "", "", true, Microsoft.Office.Interop.Excel.XlPlatform.xlWindows, "\t", false, false, 0, true, 1, 0);
+        workBook.SaveAs(
+          filename, Type.Missing, 
+          Type.Missing, Type.Missing, 
+          Type.Missing, Type.Missing, 
+          Microsoft.Office.Interop.Excel.
+          XlSaveAsAccessMode.xlExclusive, 
+          Type.Missing, Type.Missing, 
+          Type.Missing, Type.Missing);
+        workBook = app.Workbooks.Open(
+          filename, 0, 
+          true, 5, 
+          "", "", 
+          true, 
+          Microsoft.Office.
+          Interop.Excel.XlPlatform.xlWindows, 
+          "\t", false,
+          false, 0, true, 1, 0);
         workSheet = (Excel.Worksheet)workBook.Worksheets.get_Item(1);
       }
 
@@ -147,59 +159,5 @@ namespace datagraph
         GarbageCollector.releaseObject(workBook);
         GarbageCollector.releaseObject(app);
       }
-
-      public void plotGraph(DataTable dataTable, DataGridView dataGridView1)
-      {
-        var path = configurePath();
-
-        string filename = @path + "\\exprt.xls";
-        try
-        {
-          configureExcelApp();
-          var worksheet = configureWorksheet();
-
-          for (int i = 1; i < dataGridView1.Columns.Count + 1; i++)
-          {
-            worksheet.Cells[1, i] = dataGridView1.Columns[i - 1].HeaderText;
-          }
-
-          for (int i = 0; i < dataGridView1.Rows.Count - 1; i++)
-          {
-            for (int j = 0; j < dataGridView1.Columns.Count; j++)
-            {
-              worksheet.Cells[i + 2, j + 1] = dataGridView1.Rows[i].Cells[j].Value.ToString();
-            }
-          }
-          saveToTempExcel(filename);
-          configureChartsAndSave();
-        }
-        catch (System.Exception ex)
-        {
-          MessageBox.Show(ex.ToString(), "Error", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-        finally
-        {
-          releaseObjects();
-        }
-      }
-      public void plotGraph(DataTable dataTable, string fileName)
-      {
-        try
-        {
-          configurePath();
-          configureExcelApp();
-          exportExternalFile(fileName);
-          configureChartsAndSave();
-        }
-        catch (System.Exception ex)
-        {
-          MessageBox.Show(ex.ToString(), "Error during exporting data", MessageBoxButtons.OK, MessageBoxIcon.Error);
-        }
-        finally
-        {
-          releaseObjects();
-        }
-      }
     }
   }
-}
