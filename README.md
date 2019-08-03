@@ -10,3 +10,6 @@ Functionalities:
  - Plot graph button plots the graph from the calculated data points.
  - Graph can be plotted by importing external data points.
  - Graph is available on the third tab to download.
+
+
+![alt text](https://github.com/Soumya117/plotGraphWithExcel/blob/master/graph1.jpeg)
